@@ -3,7 +3,7 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/allmyfutures/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/allmyfutures/zod-friendly-forms)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage/allmyfutures/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/allmyfutures/zod-friendly-forms/test_coverage)
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/allmyfutures/zod-friendly-forms?style=flat-square)](https://github.com/allmyfutures/zod-friendly-forms/releases/latest)
-[![NPM Downloads](https://img.shields.io/npm/dt/zod-friendly-forms?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-friendly-forms)
+[![NPM Downloads](https://img.shields.io/npm/dt/zod-ff?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-ff)
 
 Return a key value object of form errors using `zod`.
 
