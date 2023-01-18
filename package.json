@@ -27,6 +27,7 @@
   "devDependencies": {
     "@jmondi/tsconfig": "^0.1.0",
     "@vitest/coverage-c8": "^0.27.2",
+    "prettier": "^2.8.3",
     "vitest": "^0.27.2",
     "zod": "^3.20.2"
   },

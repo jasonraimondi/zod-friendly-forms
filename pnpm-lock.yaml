@@ -3,12 +3,14 @@ lockfileVersion: 5.4
 specifiers:
   '@jmondi/tsconfig': ^0.1.0
   '@vitest/coverage-c8': ^0.27.2
+  prettier: ^2.8.3
   vitest: ^0.27.2
   zod: ^3.20.2
 
 devDependencies:
   '@jmondi/tsconfig': 0.1.0
   '@vitest/coverage-c8': 0.27.2
+  prettier: 2.8.3
   vitest: 0.27.2
   zod: 3.20.2
 
@@ -695,6 +697,12 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /prettier/2.8.3:
+    resolution: {integrity: sha512-tJ/oJ4amDihPoufT5sM0Z1SKEuKay8LfVAMlbbhnnkvt6BUserZylqo2PN+p9KeljLr0OHa2rXHU1T8reeoTrw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /require-directory/2.1.1:
