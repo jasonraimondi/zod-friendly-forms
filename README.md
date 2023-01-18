@@ -15,14 +15,7 @@ pnpm add zod-ff zod
 
 ## Usage
 
-```ts
-const { errors } = parseForm(schema, input);
-// errors = { name: 'Name is required' }
-```
-
-## Examples
-
-### Svelte
+This library will work on the server or client, in any framework. Here is an example in Svelte:
 
 ```html
 <script lang="ts">
