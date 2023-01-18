@@ -1,0 +1,36 @@
+{
+  "name": "zod-ff",
+  "description": "Friendly Forms for Zod",
+  "version": "0.1.0",
+  "author": "Jason Raimondi <jason@raimondi.us>",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=16.12.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "build": "tsc",
+    "prepublish": "rm -rf ./dist && pnpm test && pnpm build"
+  },
+  "keywords": [
+    "zod",
+    "zod-plugin",
+    "zod-form-parser"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@jmondi/tsconfig": "^0.1.0",
+    "@vitest/coverage-c8": "^0.27.2",
+    "vitest": "^0.27.2",
+    "zod": "^3.20.2"
+  },
+  "peerDependencies": {
+    "zod": "^3.19.0"
+  }
+}
