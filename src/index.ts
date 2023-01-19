@@ -16,24 +16,30 @@ export function parseForm<TSchema extends z.ZodType>(
   type PassResult = { errors?: never; data: z.infer<TSchema> };
   type FailResult = { errors: Errors; data?: never };
 
+  let unknownData: Record<string, unknown>;
+
   if (data instanceof FormData) {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of data.entries()) {
-      result[key] = value;
-    }
-    data = result;
+    unknownData = extractFormData(data);
+  } else {
+    unknownData = data;
   }
 
-  const result = schema.safeParse(data);
+  const parseResults = schema.safeParse(unknownData);
 
-  if (result.success) {
-    return { data: result.data } as PassResult;
+  if (parseResults.success) {
+    return { data: parseResults.data } as PassResult;
   }
 
-  const errors = result.error.errors.reduce<Errors>((prev, next) => {
+  const errors = flattenErrors(parseResults, options?.flatResult);
+
+  return { errors } as FailResult;
+}
+
+function flattenErrors(result: z.SafeParseError<any>, flatResult = false) {
+  return result.error.errors.reduce<Errors>((prev, next) => {
     let result = { ...prev };
 
-    if (options?.flatResult) {
+    if (flatResult) {
       const key = next.path.join(".");
       result[key] = next.message;
     } else {
@@ -47,8 +53,14 @@ export function parseForm<TSchema extends z.ZodType>(
 
     return result;
   }, {});
+}
 
-  return { errors } as FailResult;
+function extractFormData(data: FormData): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of data.entries()) {
+    result[key] = value;
+  }
+  return result;
 }
 
 export default parseForm;

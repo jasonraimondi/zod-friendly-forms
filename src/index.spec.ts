@@ -59,12 +59,6 @@ describe("with POJO data input", () => {
   });
 
   it("supports objects", async () => {
-    const schema = z.object({
-      age: z.number().positive().max(150),
-      email: z.string().email(),
-      password: z.string().min(8),
-      rememberMe: z.boolean(),
-    });
     const innerSchema = z.object({
       user: schema,
     });
