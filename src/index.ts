@@ -13,8 +13,8 @@ export function parseForm<TSchema extends z.ZodType>(
   { data, schema }: ParseFormParams<TSchema>,
   options: Options = {},
 ) {
-  type PassResult = { errors?: never; data: z.infer<TSchema> };
-  type FailResult = { errors: Errors; data?: never };
+  type PassResult = { errors?: never; validData: z.infer<TSchema> };
+  type FailResult = { errors: Errors; validData?: never };
 
   let unknownData: Record<string, unknown>;
 
@@ -27,7 +27,7 @@ export function parseForm<TSchema extends z.ZodType>(
   const parseResults = schema.safeParse(unknownData);
 
   if (parseResults.success) {
-    return { data: parseResults.data } as PassResult;
+    return { validData: parseResults.data } as PassResult;
   }
 
   const errors = flattenErrors(parseResults, options?.flatResult);

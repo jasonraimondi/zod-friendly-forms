@@ -41,9 +41,9 @@ describe("with POJO data input", () => {
     const data = {};
     const schema = z.object({ nickname: z.number().optional() });
 
-    const { data: outputData, errors } = parseForm({ schema, data });
+    const { validData, errors } = parseForm<typeof schema>({ schema, data });
 
-    expect(outputData).toStrictEqual({});
+    expect(validData).toStrictEqual({});
     expect(errors).toBeUndefined();
   });
 
@@ -115,10 +115,10 @@ describe("with FormData data input", () => {
     data.append("password", "bobobobobbobo");
     data.append("rememberMe", "true");
 
-    const { data: formData, errors } = parseForm({ schema, data });
+    const { validData, errors } = parseForm({ schema, data });
 
     expect(errors).toBeUndefined();
-    expect(formData).toStrictEqual({
+    expect(validData).toStrictEqual({
       age: 99,
       email: "bob@example.com",
       password: "bobobobobbobo",
