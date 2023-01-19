@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type Options = { flatResult?: boolean };
+export type Options = { nestedResults?: boolean };
 
 export type Errors = Record<string, string | Record<string, string>>;
 
@@ -30,12 +30,14 @@ export function parseForm<TSchema extends z.ZodType>(
     return { validData: parseResults.data } as PassResult;
   }
 
-  const errors = flattenErrors(parseResults, options?.flatResult);
+  const flatResult = !options.nestedResults;
+
+  const errors = flattenErrors(parseResults, flatResult);
 
   return { errors } as FailResult;
 }
 
-function flattenErrors(result: z.SafeParseError<any>, flatResult = false) {
+function flattenErrors(result: z.SafeParseError<any>, flatResult = true) {
   return result.error.errors.reduce<Errors>((prev, next) => {
     let result = { ...prev };
 

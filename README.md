@@ -5,7 +5,7 @@
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/allmyfutures/zod-friendly-forms?style=flat-square)](https://github.com/allmyfutures/zod-friendly-forms/releases/latest)
 [![NPM Downloads](https://img.shields.io/npm/dt/zod-ff?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-ff)
 
-Return a key value object of form errors using `zod`.
+Returns an object containing `errors` and `validData`. The `errors` object contains user-friendly error messages, making it easy to display validation errors to the user, while the `validData` object contains the typed and valid data from the schema. This library can be used in any framework, both on the server or client side and it allows for easy validation and handling of form submissions.
 
 ## Install
 
@@ -15,7 +15,107 @@ pnpm add zod-ff zod
 
 ## Usage
 
-This library will work on the server or client, in any framework. Here is an example in Svelte:
+Create a [zod] schema.
+
+```typescript
+import { z } from "zod";
+const RegisterSchema = z.object({
+  age: z.number().positive().max(150),
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+```
+
+When you're ready to validate your input data, go ahead and run the `parseForm` function. If there are any errors, they will be available by input key.
+
+```typescript
+import { parseForm } from "zod-ff";
+
+const data = {
+  email: "invalid-email"
+};
+const { errors } = parseForm({ schema: RegisterSchema, data });
+
+expect(errors).toStrictEqual({
+  age: "Number must be less than or equal to 150",
+  email: "Invalid email",
+  password: "Required",
+});
+```
+
+If errors are undefined, the input was valid. A returned `validData` object will be typed with your response.
+
+```typescript
+import { parseForm } from "zod-ff";
+
+const data = {
+  age: 99,
+  email: "bob@example.com",
+  password: "bobobobobobob",
+};
+const { errors, validData } = parseForm<typeof RegisterSchema>({ 
+  schema: RegisterSchema, 
+  data,
+});
+
+expect(errors).toBeUndefined();
+expect(validData).toStrictEqual(data);
+```
+
+### Nested Objects
+
+If you use nested objects, by default, your results will be flattened.
+
+```typescript
+const schema = z.object({
+  user: z.object({
+    email: z.string().email(),
+  }),
+});
+const data = {
+  user: {
+    email: "bob",
+  },
+};
+
+const { errors } = parseForm({ schema: RegisterSchema, data }, options);
+
+expect(errors).toStrictEqual({
+  "user.email": "Invalid Email Address",
+});
+```
+
+If you want your responses passed as nested objects, you can use the `nestedResults` option.
+
+```typescript
+import { parseForm, Options } from "zod-ff";
+
+const schema = z.object({
+  user: z.object({
+    email: z.string().email(),
+  }),
+});
+const data = {
+  user: {
+    email: "bob",
+  },
+};
+const options: Options = { nestedResults: true };
+
+const { errors } = parseForm({ schema: RegisterSchema, data }, options);
+
+expect(errors).toStrictEqual({
+  user: { 
+    email: "Invalid Email Address" 
+  },
+});
+```
+
+## Examples
+
+This library will work on the server or client, in any framework.
+
+### Svelte Examples
 
 ```html
 <script lang="ts">
@@ -52,7 +152,6 @@ This library will work on the server or client, in any framework. Here is an exa
       name="email"
       type="email"
       required="required"
-      style="margin-bottom: 0;"
       bind:value="{loginForm.email}"
     />
   </label>
@@ -77,128 +176,149 @@ This library will work on the server or client, in any framework. Here is an exa
 </form>
 ```
 
-### Advanced Output
-
-You can return a typed response 
+### React Example
 
 ```ts
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { parseForm } from 'zod-ff';
+import { handleLogin } from './my-login-function';
+
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   rememberMe: z.boolean(),
 });
 
-let loginInput: Record<string, unknown> = // some unknown input;
+const LoginForm = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
+  const [errors, setErrors] = useState({});
 
-const { data, errors } = parseForm<typeof LoginSchema>({ schema, data: loginInput });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    let { data, errors } = await parseForm({ schema: LoginSchema, data: formData });
+    if (!errors) await handleLogin(data);
+    setErrors(errors);
+  }
 
-if (errors) {
-  return console.log(errors);
-  // {
-  //   email: "Invalid email",
-  //   password: "Required",
-  //   rememberMe: "Required",
-  // }
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="email">Email
+        {errors.email && <span className="error">{errors.email}</span>}
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+        />
+      </label>
+
+      <label htmlFor="password">Password
+        {errors.password && <span className="error">{errors.password}</span>}
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          value={formData.password}
+          onChange={(e) => setFormData({...formData, password: e.target.value})}
+        />
+      </label>
+      <label htmlFor="rememberMe">Remember Me
+        <input
+          id="rememberMe"
+          type="checkbox"
+          checked={formData.rememberMe}
+          onChange={(e) => setFormData({...formData, rememberMe: e.target.checked})}
+        />
+      </label>
+
+      <footer className="form-submit">
+        <button type="submit">Submit</button>
+      </footer>
+    </form>
+  )
 }
 
-// data here is a valid LoginSchema
-console.log(data);
 ```
 
-```ts
-// data = null
-// errors = {
-//   email: "Invalid email",
-//   password: "Required",
-//   rememberMe: "Required",
-// }
-// data = null
-// errors = {
-//   email: "Invalid email",
-//   password: "Required",
-//   rememberMe: "Required",
-// }
-```
+### Vue 3 Example
 
-### Misc Examples
+```html
+<template>
+  <form @submit.prevent="submit">
+    <label for="email">Email
+      <span class="error" v-if="errors.email">{{ errors.email }}</span>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        required
+        v-model="formData.email"
+      />
+    </label>
 
-```typescript
-import { z } from "zod";
-import { parseForm } from "zod-ff";
+    <label for="password">Password
+      <span class="error" v-if="errors.password">{{ errors.password }}</span>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        required
+        v-model="formData.password"
+      />
+    </label>
+    <label for="rememberMe">Remember Me
+      <input
+        id="rememberMe"
+        type="checkbox"
+        v-model="formData.rememberMe"
+      />
+    </label>
 
-const RegisterSchema = z.object({
-  age: z.number().positive().max(150),
+    <footer class="form-submit">
+      <button type="submit">Submit</button>
+    </footer>
+  </form>
+</template>
+
+<script>
+import { z } from 'zod';
+import { parseForm } from 'zod-ff';
+import { handleLogin } from './my-login-function';
+
+const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   rememberMe: z.boolean(),
 });
-```
 
-```typescript
-const data = {};
-const { errors } = parseForm({ schema: RegisterSchema, data });
-expect(errors).toStrictEqual({
-  age: "Number must be less than or equal to 150",
-  email: "Invalid email",
-  password: "Required",
-  rememberMe: "Required",
-});
-```
-
-```typescript
-const data = {
-  age: 99,
-  email: "bob@example.com",
-  password: "bobobobobobob",
-  rememberMe: true,
-};
-const { errors } = parseForm({ schema: RegisterSchema, data });
-expect(errors).toBeUndefined();
-```
-
-```typescript
-const data = {
-  age: 99,
-  email: "bob",
-  password: "bobobobobobob",
-  rememberMe: true,
-};
-const { errors } = parseForm({ schema: RegisterSchema, data });
-expect(errors).toStrictEqual({
-  email: "Invalid Email Address",
-});
-```
-
-#### Deep Objects
-
-```typescript
-const data = {
-  user: {
-    email: "bob",
+export default {
+  data() {
+    return {
+      formData: {
+        email: "",
+        password: "",
+        rememberMe: false,
+      },
+      errors: {}
+    };
   },
+  methods: {
+    async submit() {
+      let { data, errors } = await parseForm({ schema: LoginSchema, data: this.formData });
+      if (!errors) await handleLogin(data);
+      this.errors = errors;
+    }
+  }
 };
-const { errors } = parseForm({ schema: RegisterSchema, data });
-expect(errors).toStrictEqual({
-  user: {
-    email: "Invalid Email Address",
-  },
-});
+</script>
 ```
 
-```typescript
-const schema = z.object({
-  user: z.object({
-    email: z.string().email(),
-  }),
-});
-const data = {
-  user: {
-    email: "bob",
-  },
-};
-const options = { flatResult: true };
-const { errors } = parseForm({ schema: RegisterSchema, data }, options);
-expect(errors).toStrictEqual({
-  "user.email": "Invalid Email Address",
-});
-```
+[zod]: <https://github.com/colinhacks/zod>

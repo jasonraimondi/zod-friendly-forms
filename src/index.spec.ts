@@ -4,7 +4,7 @@ import { z } from "zod";
 import { parseForm } from "./index.js";
 
 describe("with POJO data input", () => {
-  const schema = z.object({
+  const TestingSchema = z.object({
     age: z.number().positive().max(150),
     email: z.string().email(),
     password: z.string().min(8),
@@ -19,7 +19,7 @@ describe("with POJO data input", () => {
       rememberMe: true,
     };
 
-    const { errors } = parseForm({ schema, data });
+    const { errors } = parseForm({ schema: TestingSchema, data });
 
     expect(errors).toBeUndefined();
   });
@@ -27,7 +27,7 @@ describe("with POJO data input", () => {
   it("returns a dict of errors", async () => {
     const data = { age: 199, email: "jason" };
 
-    const { errors } = parseForm({ schema, data });
+    const { errors } = parseForm({ schema: TestingSchema, data });
 
     expect(errors).toStrictEqual({
       age: "Number must be less than or equal to 150",
@@ -60,7 +60,7 @@ describe("with POJO data input", () => {
 
   it("supports objects", async () => {
     const innerSchema = z.object({
-      user: schema,
+      user: TestingSchema,
     });
     const data = {
       user: {
@@ -73,29 +73,27 @@ describe("with POJO data input", () => {
     const { errors } = parseForm({ schema: innerSchema, data });
 
     expect(errors).toStrictEqual({
-      user: {
-        email: "Required",
-      },
+      "user.email": "Required",
     });
   });
 
-  it("supports objects with flatResult", async () => {
+  it("supports objects with nestedResults", async () => {
     const innerSchema = z.object({
-      user: schema,
+      user: TestingSchema,
     });
     const data = {
-      user: {
-        age: 99,
-        email: "jason",
-      },
+      user: {},
     };
 
-    const { errors } = parseForm({ schema: innerSchema, data }, { flatResult: true });
+    const { errors } = parseForm({ schema: innerSchema, data }, { nestedResults: true });
 
     expect(errors).toStrictEqual({
-      "user.email": "Invalid email",
-      "user.password": "Required",
-      "user.rememberMe": "Required",
+      user: {
+        age: "Number must be less than or equal to 150",
+        email: "Invalid email",
+        password: "Required",
+        rememberMe: "Required",
+      },
     });
   });
 });
