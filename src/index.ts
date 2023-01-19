@@ -9,10 +9,9 @@ export type ParseFormParams<TSchema extends z.ZodType> = {
   data: Record<string, unknown> | FormData;
 };
 
-export function parseForm<TSchema extends z.ZodType>(
-  { data, schema }: ParseFormParams<TSchema>,
-  options: Options = {},
-) {
+export function parseForm<TSchema extends z.ZodType>(params: ParseFormParams<TSchema>) {
+  const { schema, data } = params;
+
   type PassResult = { errors?: never; validData: z.infer<TSchema> };
   type FailResult = { errors: Errors; validData?: never };
 
@@ -30,29 +29,16 @@ export function parseForm<TSchema extends z.ZodType>(
     return { validData: parseResults.data } as PassResult;
   }
 
-  const flatResult = !options.nestedResults;
-
-  const errors = flattenErrors(parseResults, flatResult);
+  const errors = flattenErrors(parseResults);
 
   return { errors } as FailResult;
 }
 
-function flattenErrors(result: z.SafeParseError<any>, flatResult = true) {
+function flattenErrors(result: z.SafeParseError<any>) {
   return result.error.errors.reduce<Errors>((prev, next) => {
     let result = { ...prev };
-
-    if (flatResult) {
-      const key = next.path.join(".");
-      result[key] = next.message;
-    } else {
-      const inner = next.path.reduceRight((innerPrev, innerNext, idx) => {
-        const isLastElement = idx === next.path.length - 1;
-        if (isLastElement) return { [innerNext]: next.message };
-        return { [innerNext]: innerPrev };
-      }, {});
-      result = { ...result, ...inner };
-    }
-
+    const key = next.path.join(".");
+    result[key] = next.message;
     return result;
   }, {});
 }

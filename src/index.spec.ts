@@ -62,37 +62,16 @@ describe("with POJO data input", () => {
       user: TestingSchema,
     });
     const data = {
-      user: {
-        age: 99,
-        password: "bobloblaw",
-        rememberMe: true,
-      },
+      user: {},
     };
 
     const { errors } = parseForm({ schema: innerSchema, data });
 
     expect(errors).toStrictEqual({
+      "user.age": "Required",
       "user.email": "Required",
-    });
-  });
-
-  it("supports objects with nestedResults", async () => {
-    const innerSchema = z.object({
-      user: TestingSchema,
-    });
-    const data = {
-      user: {},
-    };
-
-    const { errors } = parseForm({ schema: innerSchema, data }, { nestedResults: true });
-
-    expect(errors).toStrictEqual({
-      user: {
-        age: "Number must be less than or equal to 150",
-        email: "Invalid email",
-        password: "Required",
-        rememberMe: "Required",
-      },
+      "user.password": "Required",
+      "user.rememberMe": "Required",
     });
   });
 });

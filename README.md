@@ -85,32 +85,6 @@ expect(errors).toStrictEqual({
 });
 ```
 
-If you want your responses passed as nested objects, you can use the `nestedResults` option.
-
-```typescript
-import { parseForm, Options } from "zod-ff";
-
-const schema = z.object({
-  user: z.object({
-    email: z.string().email(),
-  }),
-});
-const data = {
-  user: {
-    email: "bob",
-  },
-};
-const options: Options = { nestedResults: true };
-
-const { errors } = parseForm({ schema: RegisterSchema, data }, options);
-
-expect(errors).toStrictEqual({
-  user: { 
-    email: "Invalid Email Address" 
-  },
-});
-```
-
 ## Examples
 
 This library will work on the server or client, in any framework.
