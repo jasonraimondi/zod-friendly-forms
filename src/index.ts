@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export type Options = { nestedResults?: boolean };
-
 export type Errors = Record<string, string | Record<string, string>>;
 
 export type ParseFormParams<TSchema extends z.ZodType> = {
