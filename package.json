@@ -1,7 +1,7 @@
 {
   "name": "zod-ff",
   "description": "Friendly Forms for Zod",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Jason Raimondi <jason@raimondi.us>",
   "type": "module",
   "exports": "./dist/index.js",
