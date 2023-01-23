@@ -11,13 +11,24 @@ data from the schema. This library can be used in any framework, both on the
 server or client side and it allows for easy validation and handling of form
 submissions.
 
-## Install
+- [NPM](npm-package)
+- [Deno](deno-package)
+
+## Install (npm)
 
 ```bash
 pnpm add zod-ff zod
 ```
 
 ## Usage
+
+```ts
+// from deno.land
+import { parseForm } from "https://deno.land/x/zod_ff";
+
+// from npm
+import { parseForm } from "zod-ff";
+```
 
 Create a [zod] schema.
 
@@ -308,4 +319,6 @@ export default {
 </script>
 ```
 
-[zod]: <https://github.com/colinhacks/zod>
+[deno-package]: https://deno.land/x/zod_ff
+[npm-package]: https://www.npmjs.com/package/zod-ff
+[zod]: https://github.com/colinhacks/zod
