@@ -42,6 +42,10 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ env.DENO_VERSION }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
       - run: echo ${{ github.ref_name }} > VERSION
       - run: cat VERSION
       - run: deno run -A bin/build_npm.ts ${{ github.ref_name }}
