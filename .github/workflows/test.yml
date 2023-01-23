@@ -45,7 +45,7 @@ jobs:
       - run: echo ${{ github.ref_name }} > VERSION
       - run: cat VERSION
       - run: deno run -A bin/build_npm.ts ${{ github.ref_name }}
-      - run: npm publish
+      - run: npm publish --access=public
         working-directory: ./npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
