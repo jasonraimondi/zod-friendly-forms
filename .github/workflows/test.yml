@@ -23,6 +23,7 @@ jobs:
           deno-version: ${{ env.DENO_VERSION }}
       - run: deno fmt --check
       - run: deno test --coverage=./coverage
+      - run: deno coverage ./coverage --lcov --output=coverage/lcov.info
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         name: report coverage to code climate
         run: |
