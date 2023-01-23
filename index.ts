@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./deps.ts";
 
 export type Errors = Record<string, string | Record<string, string>>;
 
@@ -7,7 +7,9 @@ export type ParseFormParams<TSchema extends z.ZodType> = {
   data: Record<string, unknown> | FormData;
 };
 
-export function parseForm<TSchema extends z.ZodType>(params: ParseFormParams<TSchema>) {
+export function parseForm<TSchema extends z.ZodType>(
+  params: ParseFormParams<TSchema>,
+) {
   const { schema, data } = params;
 
   type PassResult = { errors?: never; validData: z.infer<TSchema> };

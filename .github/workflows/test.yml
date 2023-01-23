@@ -1,39 +1,30 @@
 name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - '*'
+  release:
+    types: [created]
 
 env:
-  PNPM_VERSION: "7"
-  NODE_VERSION: "18.x"
+  DENO_VERSION: v1.x
 
 jobs:
   test:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
-
-    name: "${{ matrix.os }} | Node ${{ matrix.node-version }}"
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
-
+    name: "Deno v1.x"
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: denoland/setup-deno@v1
         with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm i --frozen-lockfile --production false
-      - run: pnpm test -- --coverage
-      - run: pnpm prettier --check .
-      - name: report coverage to code climate
-        if: ${{ matrix.node-version == '18.x' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          deno-version: ${{ env.DENO_VERSION }}
+      - run: deno fmt --check
+      - run: deno test --coverage=./coverage
+      - if: github.event_name == 'release' && github.event.action == 'created'
+        name: report coverage to code climate
         run: |
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
@@ -41,3 +32,20 @@ jobs:
           ./cc-test-reporter upload-coverage
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+
+  publish:
+    needs: test
+    if: github.event_name == 'release' && github.event.action == 'created'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - run: echo ${{ github.ref_name }} > VERSION
+      - run: cat VERSION
+      - run: deno run -A scripts/build_npm.ts ${{ github.ref_name }}
+#      - run: npm publish
+#        working-directory: ./npm
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
