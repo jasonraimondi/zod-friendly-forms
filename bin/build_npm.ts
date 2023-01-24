@@ -4,6 +4,7 @@ import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
 await emptyDir("./npm");
 
 await build({
+  packageManager: "pnpm",
   entryPoints: ["./mod.ts"],
   outDir: "./npm",
   shims: {
@@ -13,6 +14,9 @@ await build({
     },
     // shim FormData
     undici: true,
+  },
+  compilerOptions: {
+    lib: ["es2021", "dom"],
   },
   package: {
     name: "zod-ff",
@@ -32,10 +36,18 @@ await build({
       url: "https://github.com/allmyfutures/zod-friendly-forms/issues",
     },
     peerDependencies: {
-      zod: "^3.19.0",
+      zod: "^3.20.2",
     },
   },
 });
+
+// ensure the test data is ignored in the `.npmignore` file
+// so it doesn't get published with your npm package
+await Deno.writeTextFile(
+  "npm/.npmignore",
+  "esm/testdata/\nscript/testdata/\n",
+  { append: true },
+);
 
 // post build steps
 Deno.copyFileSync("LICENSE", "npm/LICENSE");
