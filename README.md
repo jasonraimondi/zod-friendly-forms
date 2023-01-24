@@ -1,5 +1,7 @@
 # Zod Friendly Forms
 
+[![Deno Version](https://shield.deno.dev/x/zod_ff?style=flat-square)](https://deno.land/x/zod_ff)
+[![Npmjs.org Version](https://img.shields.io/npm/v/zod-ff?style=flat-square)](https://www.npmjs.com/package/zod-ff)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/allmyfutures/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/allmyfutures/zod-friendly-forms)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage/allmyfutures/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/allmyfutures/zod-friendly-forms/test_coverage)
 [![NPM Downloads](https://img.shields.io/npm/dt/zod-ff?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-ff)
@@ -11,24 +13,28 @@ data from the schema. This library can be used in any framework, both on the
 server or client side and it allows for easy validation and handling of form
 submissions.
 
-- [NPM](npm-package)
-- [Deno](deno-package)
-
 ## Install (npm)
 
 ```bash
 pnpm add zod-ff zod
 ```
 
-## Usage
+## Import
+
+### Deno [[link]](https://deno.land/x/zod_ff)
 
 ```ts
-// from deno.land
 import { parseForm } from "https://deno.land/x/zod_ff";
+import { parseForm } from "https://deno.land/x/zod_ff";
+```
 
-// from npm
+### NPM [[link]](https://www.npmjs.com/package/zod-ff)
+
+```ts
 import { parseForm } from "zod-ff";
 ```
+
+## Usage
 
 Create a [zod] schema.
 
@@ -118,24 +124,24 @@ This library will work on the server or client, in any framework.
   let errors;
 
   const LoginSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    rememberMe: z.boolean(),
-  });
-
-  const loginForm = {
-    email: "",
-    password: "",
-    rememberMe: false,
-  };
-
-  async function submit() {
-    let { data, errors } = await parseForm<typeof LoginSchema>({ schema: LoginSchema, data: loginForm });
-    if (!errors) await handleLogin(data);
-  }
-</script>
-
-<form on:submit|preventDefault="{submit}">
+    email: z.string().email(),  
+    password: z.string().min(8),  
+    rememberMe: z.boolean(),  
+  });  
+  
+  const loginForm = {  
+    email: "",  
+    password: "",  
+    rememberMe: false,  
+  };  
+  
+  async function submit() {  
+    let { data, errors } = await parseForm<typeof LoginSchema>({ schema: LoginSchema, data: loginForm });  
+    if (!errors) await handleLogin(data);  
+  }  
+</script>  
+  
+<form on:submit|preventDefault="{submit}">  
   <label for="email">Email
     {#if errors?.email}<span class="error">{errors.email}</span>{/if}
     <input
@@ -158,12 +164,12 @@ This library will work on the server or client, in any framework.
     />
   </label>
   <label for="rememberMe">Remember Me
-    <input id="rememberMe" type="checkbox" bind:checked="{loginForm.rememberMe}" />
-  </label>
-
-  <footer class="form-submit">
-    <button type="submit">Submit</button>
-  </footer>
+    <input id="rememberMe" type="checkbox" bind:checked="{loginForm.rememberMe}" />  
+  </label>  
+  
+  <footer class="form-submit">  
+    <button type="submit">Submit</button>  
+  </footer>  
 </form>
 ```
 
@@ -249,8 +255,8 @@ const LoginForm = () => {
 ### Vue 3 Example
 
 ```html
-<template>
-  <form @submit.prevent="submit">
+<template>  
+  <form @submit.prevent="submit">  
     <label for="email">Email
       <span class="error" v-if="errors.email">{{ errors.email }}</span>
       <input
@@ -281,9 +287,9 @@ const LoginForm = () => {
     </label>
 
     <footer class="form-submit">
-      <button type="submit">Submit</button>
-    </footer>
-  </form>
+      <button type="submit">Submit</button>  
+    </footer>  
+  </form>  
 </template>
 
 <script>
@@ -294,28 +300,28 @@ import { handleLogin } from './my-login-function';
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  rememberMe: z.boolean(),
-});
-
-export default {
-  data() {
-    return {
-      formData: {
-        email: "",
-        password: "",
-        rememberMe: false,
-      },
-      errors: {}
-    };
-  },
-  methods: {
-    async submit() {
-      let { data, errors } = await parseForm({ schema: LoginSchema, data: this.formData });
-      if (!errors) await handleLogin(data);
-      this.errors = errors;
-    }
-  }
-};
+  rememberMe: z.boolean(),  
+});  
+  
+export default {  
+  data() {  
+    return {  
+      formData: {  
+        email: "",  
+        password: "",  
+        rememberMe: false,  
+      },  
+      errors: {}  
+    };  
+  },  
+  methods: {  
+    async submit() {  
+      let { data, errors } = await parseForm({ schema: LoginSchema, data: this.formData });  
+      if (!errors) await handleLogin(data);  
+      this.errors = errors;  
+    }  
+  }  
+};  
 </script>
 ```
 
