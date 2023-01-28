@@ -1,21 +1,21 @@
 import { z } from "./deps.ts";
 
-export type ParseFormParams<TSchema extends z.ZodType> = {
-  schema: TSchema;
+export type ParseFormParams = {
+  schema: z.ZodType;
   data: Record<string, unknown> | FormData;
 };
 
-export type ParseFormResult<TSchema extends z.ZodType> = {
+export type ParseFormResult<T extends z.ZodType> = {
   errors?: never;
-  validData: z.infer<TSchema>;
+  validData: z.infer<T>;
 } | {
   errors: Record<string, string>;
   validData?: never;
 };
 
-export function parseForm<TSchema extends z.ZodType>(
-  params: ParseFormParams<TSchema>,
-): ParseFormResult<TSchema> {
+export function parseForm(
+  params: ParseFormParams,
+): ParseFormResult<typeof params.schema> {
   const { schema, data } = params;
 
   let unknownData: Record<string, unknown>;

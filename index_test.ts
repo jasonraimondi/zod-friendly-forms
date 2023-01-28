@@ -42,7 +42,7 @@ Deno.test("with Record<string, uknown> input", async (t) => {
     const data = {};
     const schema = z.object({ nickname: z.number().optional() });
 
-    const { validData, errors } = parseForm<typeof schema>({ schema, data });
+    const { validData, errors } = parseForm({ schema, data });
 
     assertEquals(validData, {});
     assertEquals(errors, undefined);
