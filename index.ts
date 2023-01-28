@@ -1,19 +1,22 @@
 import { z } from "./deps.ts";
 
-export type Errors = Record<string, string | Record<string, string>>;
-
 export type ParseFormParams<TSchema extends z.ZodType> = {
   schema: TSchema;
   data: Record<string, unknown> | FormData;
 };
 
+export type ParseFormResult<TSchema extends z.ZodType> = {
+  errors?: never;
+  validData: z.infer<TSchema>;
+} | {
+  errors: Record<string, string>;
+  validData?: never;
+};
+
 export function parseForm<TSchema extends z.ZodType>(
   params: ParseFormParams<TSchema>,
-) {
+): ParseFormResult<TSchema> {
   const { schema, data } = params;
-
-  type PassResult = { errors?: never; validData: z.infer<TSchema> };
-  type FailResult = { errors: Errors; validData?: never };
 
   let unknownData: Record<string, unknown>;
 
@@ -26,17 +29,15 @@ export function parseForm<TSchema extends z.ZodType>(
   const parseResults = schema.safeParse(unknownData);
 
   if (parseResults.success) {
-    return { validData: parseResults.data } as PassResult;
+    return { validData: parseResults.data };
   }
 
-  const errors = flattenErrors(parseResults);
-
-  return { errors } as FailResult;
+  return { errors: flattenErrors(parseResults) };
 }
 
-function flattenErrors(result: z.SafeParseError<any>) {
-  return result.error.errors.reduce<Errors>((prev, next) => {
-    let result = { ...prev };
+function flattenErrors(result: z.SafeParseError<unknown>) {
+  return result.error.errors.reduce<Record<string, string>>((prev, next) => {
+    const result = { ...prev };
     const key = next.path.join(".");
     result[key] = next.message;
     return result;
