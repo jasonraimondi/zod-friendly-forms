@@ -18,9 +18,9 @@ describe("with POJO data input", () => {
       rememberMe: true,
     };
 
-    const { errors } = parseForm({ schema: TestingSchema, data });
+    const result = parseForm({ schema: TestingSchema, data });
 
-    expect(errors).toBeUndefined();
+    expect(result.errors).toBeUndefined();
   });
 
   it("returns a dict of errors", async () => {
@@ -40,7 +40,7 @@ describe("with POJO data input", () => {
     const data = {};
     const schema = z.object({ nickname: z.number().optional() });
 
-    const { validData, errors } = parseForm<typeof schema>({ schema, data });
+    const { validData, errors } = parseForm({ schema, data });
 
     expect(validData).toStrictEqual({});
     expect(errors).toBeUndefined();
