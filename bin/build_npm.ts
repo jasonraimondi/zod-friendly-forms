@@ -18,6 +18,13 @@ await build({
   compilerOptions: {
     lib: ["es2021", "dom"],
   },
+  mappings: {
+    "https://deno.land/x/zod@v3.20.2/mod.ts": {
+      name: "zod",
+      version: "^3.20.2",
+      peerDependency: true,
+    },
+  },
   package: {
     name: "zod-ff",
     version: Deno.args[0]?.replace("v", ""),
@@ -35,7 +42,7 @@ await build({
     bugs: {
       url: "https://github.com/allmyfutures/zod-friendly-forms/issues",
     },
-    peerDependencies: {
+    devDependencies: {
       zod: "^3.20.2",
     },
   },
