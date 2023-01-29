@@ -1,8 +1,10 @@
-import { z } from "zod";
+import { assertEquals } from "https://deno.land/std@0.173.0/testing/asserts.ts";
 
-import { parseForm } from "./index.js";
+import { z } from "./deps.ts";
 
-describe("with POJO data input", () => {
+import { parseForm } from "./index.ts";
+
+Deno.test("with Record<string, uknown> input", async (t) => {
   const TestingSchema = z.object({
     age: z.number().positive().max(150),
     email: z.string().email(),
@@ -10,7 +12,7 @@ describe("with POJO data input", () => {
     rememberMe: z.boolean(),
   });
 
-  it("returns undefined if no errors", async () => {
+  await t.step("returns undefined if no errors", () => {
     const data = {
       age: 99,
       email: "bob@example.com",
@@ -18,17 +20,17 @@ describe("with POJO data input", () => {
       rememberMe: true,
     };
 
-    const result = parseForm({ schema: TestingSchema, data });
+    const { errors } = parseForm({ schema: TestingSchema, data });
 
-    expect(result.errors).toBeUndefined();
+    assertEquals(errors, undefined);
   });
 
-  it("returns a dict of errors", async () => {
+  await t.step("returns a dict of errors", () => {
     const data = { age: 199, email: "jason" };
 
     const { errors } = parseForm({ schema: TestingSchema, data });
 
-    expect(errors).toStrictEqual({
+    assertEquals(errors, {
       age: "Number must be less than or equal to 150",
       email: "Invalid email",
       password: "Required",
@@ -36,17 +38,17 @@ describe("with POJO data input", () => {
     });
   });
 
-  it("ignores optional fields", async () => {
+  await t.step("ignores optional fields", () => {
     const data = {};
     const schema = z.object({ nickname: z.number().optional() });
 
     const { validData, errors } = parseForm({ schema, data });
 
-    expect(validData).toStrictEqual({});
-    expect(errors).toBeUndefined();
+    assertEquals(validData, {});
+    assertEquals(errors, undefined);
   });
 
-  it("can use custom messages", async () => {
+  await t.step("can use custom messages", () => {
     const data = {};
     const schema = z.object({
       quote: z.string({ required_error: "Quote is required" }),
@@ -54,10 +56,10 @@ describe("with POJO data input", () => {
 
     const { errors } = parseForm({ schema, data });
 
-    expect(errors).toStrictEqual({ quote: "Quote is required" });
+    assertEquals(errors, { quote: "Quote is required" });
   });
 
-  it("supports objects", async () => {
+  await t.step("supports objects", () => {
     const innerSchema = z.object({
       user: TestingSchema,
     });
@@ -67,7 +69,7 @@ describe("with POJO data input", () => {
 
     const { errors } = parseForm({ schema: innerSchema, data });
 
-    expect(errors).toStrictEqual({
+    assertEquals(errors, {
       "user.age": "Required",
       "user.email": "Required",
       "user.password": "Required",
@@ -76,7 +78,7 @@ describe("with POJO data input", () => {
   });
 });
 
-describe("with FormData data input", () => {
+Deno.test("with FormData data input", async (t) => {
   const schema = z.object({
     age: z.coerce.number().positive().max(150),
     email: z.string().email(),
@@ -84,7 +86,7 @@ describe("with FormData data input", () => {
     rememberMe: z.coerce.boolean(),
   });
 
-  it("returns undefined if no errors", async () => {
+  await t.step("returns undefined if no errors", () => {
     const data = new FormData();
     data.append("age", "99");
     data.append("email", "bob@example.com");
@@ -93,8 +95,8 @@ describe("with FormData data input", () => {
 
     const { validData, errors } = parseForm({ schema, data });
 
-    expect(errors).toBeUndefined();
-    expect(validData).toStrictEqual({
+    assertEquals(errors, undefined);
+    assertEquals(validData, {
       age: 99,
       email: "bob@example.com",
       password: "bobobobobbobo",
@@ -102,7 +104,7 @@ describe("with FormData data input", () => {
     });
   });
 
-  it("returns a dict of errors", async () => {
+  await t.step("returns a dict of errors", () => {
     const schema = z.object({
       age: z.coerce.number().positive().max(150),
       email: z.string().email(),
@@ -115,7 +117,7 @@ describe("with FormData data input", () => {
 
     const { errors } = parseForm({ schema, data });
 
-    expect(errors).toStrictEqual({
+    assertEquals(errors, {
       age: "Number must be less than or equal to 150",
       email: "Invalid email",
       password: "Required",
@@ -124,16 +126,16 @@ describe("with FormData data input", () => {
     });
   });
 
-  it("ignores optional fields", async () => {
+  await t.step("ignores optional fields", () => {
     const data = new FormData();
     const schema = z.object({ nickname: z.number().optional() });
 
     const { errors } = parseForm({ schema, data });
 
-    expect(errors).toBeUndefined();
+    assertEquals(errors, undefined);
   });
 
-  it("can use custom messages", async () => {
+  await t.step("can use custom messages", () => {
     const data = new FormData();
     const schema = z.object({
       quote: z.string({ required_error: "Quote is required" }),
@@ -141,6 +143,6 @@ describe("with FormData data input", () => {
 
     const { errors } = parseForm({ schema, data });
 
-    expect(errors).toStrictEqual({ quote: "Quote is required" });
+    assertEquals(errors, { quote: "Quote is required" });
   });
 });
