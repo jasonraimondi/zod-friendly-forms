@@ -19,82 +19,67 @@ submissions.
 pnpm add zod-ff zod
 ```
 
-## Import
-
-### Deno [[link]](https://deno.land/x/zod_ff)
+### Deno
 
 ```ts
 import { parseForm } from "https://deno.land/x/zod_ff";
-import { parseForm } from "https://deno.land/x/zod_ff";
-```
-
-### NPM [[link]](https://www.npmjs.com/package/zod-ff)
-
-```ts
-import { parseForm } from "zod-ff";
 ```
 
 ## Usage
 
 Create a [zod] schema.
 
-```typescript
+```ts
 import { z } from "zod";
-const RegisterSchema = z.object({
-  age: z.number().positive().max(150),
+const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
 });
 ```
 
 When you're ready to validate your input data, go ahead and run the `parseForm`
 function. If there are any errors, they will be available by input key.
 
-```typescript
+```ts
 import { parseForm } from "zod-ff";
 
 const data = {
   email: "invalid-email",
 };
-const { errors } = parseForm({ schema: RegisterSchema, data });
+const { errors } = parseForm({ schema, data });
 
-expect(errors).toStrictEqual({
-  age: "Number must be less than or equal to 150",
-  email: "Invalid email",
-  password: "Required",
-});
+errors;
+// {
+//   email: "Invalid email",
+// }
 ```
 
 If errors are undefined, the input was valid. A returned `validData` object will
 be typed with your response.
 
-```typescript
+```ts
 import { parseForm } from "zod-ff";
 
 const data = {
-  age: 99,
   email: "bob@example.com",
-  password: "bobobobobobob",
 };
-const { errors, validData } = parseForm<typeof RegisterSchema>({
-  schema: RegisterSchema,
-  data,
-});
+const { errors, validData } = parseForm({ schema, data });
 
-expect(errors).toBeUndefined();
-expect(validData).toStrictEqual(data);
+errors;
+// undefined
+
+validData;
+// {
+//   email: "bob@example.com",
+// }
 ```
 
-### Nested Objects
-
-If you use nested objects, by default, your results will be flattened.
-
-```typescript
+```ts
 const schema = z.object({
   user: z.object({
     email: z.string().email(),
   }),
 });
+
 const data = {
   user: {
     email: "bob",
@@ -103,9 +88,10 @@ const data = {
 
 const { errors } = parseForm({ schema: RegisterSchema, data }, options);
 
-expect(errors).toStrictEqual({
-  "user.email": "Invalid Email Address",
-});
+errors;
+// {
+//   "user.email": "Invalid Email Address",
+// }
 ```
 
 ## Examples
@@ -126,13 +112,11 @@ This library will work on the server or client, in any framework.
   const LoginSchema = z.object({
     email: z.string().email(),  
     password: z.string().min(8),  
-    rememberMe: z.boolean(),  
   });  
   
   const loginForm = {  
     email: "",  
     password: "",  
-    rememberMe: false,  
   };  
   
   async function submit() {  
@@ -163,9 +147,6 @@ This library will work on the server or client, in any framework.
       bind:value="{loginForm.password}"
     />
   </label>
-  <label for="rememberMe">Remember Me
-    <input id="rememberMe" type="checkbox" bind:checked="{loginForm.rememberMe}" />  
-  </label>  
   
   <footer class="form-submit">  
     <button type="submit">Submit</button>  
