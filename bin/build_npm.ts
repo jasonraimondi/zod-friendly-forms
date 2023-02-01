@@ -8,15 +8,12 @@ await build({
   entryPoints: ["./mod.ts"],
   outDir: "./npm",
   shims: {
-    // see JS docs for overview and more options
     deno: {
       test: true,
     },
-    // shim FormData
-    undici: true,
   },
   compilerOptions: {
-    lib: ["es2021", "dom"],
+    lib: ["es2021", "dom", "dom.iterable"],
   },
   mappings: {
     "https://deno.land/x/zod@v3.20.2/mod.ts": {
