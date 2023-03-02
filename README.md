@@ -73,6 +73,20 @@ validData;
 // }
 ```
 
+You can use the builtin `FormData` object.
+
+```ts
+const data = new FormData();
+data.append("email", "invalid-email");
+
+const { errors } = parseForm({ schema, data });
+
+errors;
+// {
+//   email: "Invalid email",
+// }
+```
+
 ```ts
 const schema = z.object({
   user: z.object({
