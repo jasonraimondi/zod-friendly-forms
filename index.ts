@@ -15,6 +15,7 @@ export type ParseFormResult<T extends z.ZodType> = {
 
 export function parseForm(
   params: ParseFormParams,
+  options?: { stripEmptyStrings?: boolean },
 ): ParseFormResult<typeof params.schema> {
   const { schema, data } = params;
 
@@ -24,6 +25,12 @@ export function parseForm(
     unknownData = extractFormData(data);
   } else {
     unknownData = data;
+  }
+
+  if (options?.stripEmptyStrings) {
+    Object.keys(unknownData).forEach(key => {
+      if (unknownData[key] === "") unknownData[key] = undefined;
+    });
   }
 
   const parseResults = schema.safeParse(unknownData);
