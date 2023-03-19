@@ -146,3 +146,27 @@ Deno.test("with FormData data input", async (t) => {
     assertEquals(errors, { quote: "Quote is required" });
   });
 });
+
+Deno.test("with option - stripEmptyStrings true", async (t) => {
+  await t.step("allows optional strings", () => {
+    const TestingSchema = z.object({
+      password: z.string().min(8).optional(),
+    });
+    const data = { password: "" };
+
+    const { errors } = parseForm({ schema: TestingSchema, data }, { stripEmptyStrings: true });
+
+    assertEquals(errors, undefined);
+  });
+
+  await t.step("can strip empty strings", () => {
+    const TestingSchema = z.object({
+      password: z.string().min(8),
+    });
+    const data = { password: "" };
+
+    const { errors } = parseForm({ schema: TestingSchema, data }, { stripEmptyStrings: true });
+
+    assertEquals(errors, { password: "Required" });
+  });
+});
