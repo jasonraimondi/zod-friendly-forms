@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.173.0/testing/asserts.ts";
+import { assertEquals, assertInstanceOf } from "https://deno.land/std@0.173.0/testing/asserts.ts";
 
 import { z } from "./deps.ts";
 
@@ -36,6 +36,13 @@ Deno.test("with Record<string, uknown> input", async (t) => {
       password: "Required",
       rememberMe: "Required",
     });
+  });
+
+  await t.step("returns the original zod error", () => {
+    const data = { age: 199, email: "jason" };
+    const { zodError } = parseForm({ schema: TestingSchema, data });
+
+    assertInstanceOf(zodError, z.ZodError);
   });
 
   await t.step("ignores optional fields", () => {

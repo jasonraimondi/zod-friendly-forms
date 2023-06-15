@@ -7,9 +7,11 @@ export type ParseFormParams = {
 
 export type ParseFormResult<T extends z.ZodType> = {
   errors?: never;
+  zodError?: never;
   validData: z.infer<T>;
 } | {
   errors: Record<string, string>;
+  zodError: z.ZodError<unknown>;
   validData?: never;
 };
 
@@ -39,11 +41,13 @@ export function parseForm(
     return { validData: parseResults.data };
   }
 
-  return { errors: flattenErrors(parseResults) };
+  const zodError = parseResults.error;
+
+  return { errors: flattenErrors(parseResults), zodError };
 }
 
 function flattenErrors(result: z.SafeParseError<unknown>) {
-  return result.error.errors.reduce<Record<string, string>>((prev, next) => {
+  return result.error.errors.reduce<Record<string, string>>((prev: Record<string, string>, next) => {
     const result = { ...prev };
     const key = next.path.join(".");
     result[key] = next.message;
