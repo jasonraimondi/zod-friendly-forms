@@ -47,12 +47,15 @@ export function parseForm(
 }
 
 function flattenErrors(result: z.SafeParseError<unknown>) {
-  return result.error.errors.reduce<Record<string, string>>((prev: Record<string, string>, next) => {
-    const result = { ...prev };
-    const key = next.path.join(".");
-    result[key] = next.message;
-    return result;
-  }, {});
+  return result.error.errors.reduce<Record<string, string>>(
+    (prev: Record<string, string>, next) => {
+      const result = { ...prev };
+      const key = next.path.join(".");
+      result[key] = next.message;
+      return result;
+    },
+    {},
+  );
 }
 
 function extractFormData(data: FormData): Record<string, unknown> {
