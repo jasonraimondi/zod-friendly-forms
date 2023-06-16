@@ -87,7 +87,7 @@ Deno.test("with Record<string, uknown> input", async (t) => {
 
 Deno.test("with union type errors", async (t) => {
   await t.step("returns union errors", () => {
-    const TestingSchema = z.union([
+    const schema = z.union([
       z.object({
         enabled: z.literal(true),
         title: z.string().min(1),
@@ -100,7 +100,7 @@ Deno.test("with union type errors", async (t) => {
 
     const data = { enabled: true };
 
-    const { errors } = parseForm({ schema: TestingSchema, data });
+    const { errors } = parseForm({ schema, data });
 
     assertEquals(errors, {
       "": "Invalid input",
