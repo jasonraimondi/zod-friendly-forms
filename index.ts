@@ -52,6 +52,35 @@ function flattenErrors(result: z.SafeParseError<unknown>) {
       const result = { ...prev };
       const key = next.path.join(".");
       result[key] = next.message;
+
+      // we'll cover more cases here as we need them
+      switch (next.code) {
+        case "invalid_union":
+          next.unionErrors.forEach((unionError) => {
+            unionError.errors.forEach((error) => {
+              result[error.path.join(".")] = error.message;
+            });
+          });
+          break;
+        case "invalid_type":
+        case "invalid_literal":
+        case "custom":
+        case "invalid_union_discriminator":
+        case "invalid_enum_value":
+        case "unrecognized_keys":
+        case "invalid_arguments":
+        case "invalid_return_type":
+        case "invalid_date":
+        case "invalid_string":
+        case "too_small":
+        case "too_big":
+        case "invalid_intersection_types":
+        case "not_multiple_of":
+        case "not_finite":
+        default:
+          break;
+      }
+
       return result;
     },
     {},

@@ -85,6 +85,56 @@ Deno.test("with Record<string, uknown> input", async (t) => {
   });
 });
 
+Deno.test("with union type errors", async (t) => {
+  await t.step("returns union errors", () => {
+    const TestingSchema = z.union([
+      z.object({
+        enabled: z.literal(true),
+        title: z.string().min(1),
+      }),
+      z.object({
+        enabled: z.literal(false),
+        title: z.string().min(1).nullish(),
+      }),
+    ]);
+
+    const data = { enabled: true };
+
+    const { errors } = parseForm({ schema: TestingSchema, data });
+
+    assertEquals(errors, {
+      "": "Invalid input",
+      "enabled": "Invalid literal value, expected false",
+      "title": "Required",
+    });
+  });
+
+  await t.step("returns nested union errors", () => {
+    const schema = z.object({
+      foo: z.union([
+        z.object({
+          enabled: z.literal(true),
+          title: z.string().min(1),
+        }),
+        z.object({
+          enabled: z.literal(false),
+          title: z.string().min(1).nullish(),
+        }),
+      ]),
+    });
+
+    const data = { foo: { enabled: true } };
+
+    const { errors } = parseForm({ schema, data });
+
+    assertEquals(errors, {
+      foo: "Invalid input",
+      "foo.enabled": "Invalid literal value, expected false",
+      "foo.title": "Required",
+    });
+  });
+});
+
 Deno.test("with FormData data input", async (t) => {
   const schema = z.object({
     age: z.coerce.number().positive().max(150),
