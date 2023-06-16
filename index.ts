@@ -52,6 +52,15 @@ function flattenErrors(result: z.SafeParseError<unknown>) {
       const result = { ...prev };
       const key = next.path.join(".");
       result[key] = next.message;
+
+      if (next.code === "invalid_union") {
+        next.unionErrors.forEach((unionError) => {
+          unionError.errors.forEach((error) => {
+            result[error.path.join(".")] = error.message;
+          });
+        });
+      }
+
       return result;
     },
     {},
