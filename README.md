@@ -2,8 +2,8 @@
 
 [![Deno Version](https://shield.deno.dev/x/zod_ff?style=flat-square)](https://deno.land/x/zod_ff)
 [![Npmjs.org Version](https://img.shields.io/npm/v/zod-ff?style=flat-square)](https://www.npmjs.com/package/zod-ff)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/allmyfutures/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/allmyfutures/zod-friendly-forms)
-[![Test Coverage](https://img.shields.io/codeclimate/coverage/allmyfutures/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/allmyfutures/zod-friendly-forms/test_coverage)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jasonraimondi/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/jasonraimondi/zod-friendly-forms)
+[![Test Coverage](https://img.shields.io/codeclimate/coverage/jasonraimondi/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/jasonraimondi/zod-friendly-forms/test_coverage)
 [![NPM Downloads](https://img.shields.io/npm/dt/zod-ff?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-ff)
 
 Returns an object containing `errors` and `validData`. The `errors` object
