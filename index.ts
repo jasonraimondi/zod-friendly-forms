@@ -2,7 +2,7 @@ import { z } from "./deps.ts";
 
 export type ParseFormParams = {
   schema: z.ZodType;
-  data: Record<string, unknown> | FormData;
+  data: Record<string, unknown> | FormData | URLSearchParams;
 };
 
 export type ParseFormResult<T extends z.ZodType> = {
@@ -23,7 +23,7 @@ export function parseForm(
 
   let unknownData: Record<string, unknown>;
 
-  if (data instanceof FormData) {
+  if (data instanceof FormData || data instanceof URLSearchParams) {
     unknownData = extractFormData(data);
   } else {
     unknownData = data;
@@ -87,7 +87,7 @@ function flattenErrors(result: z.SafeParseError<unknown>) {
   );
 }
 
-function extractFormData(data: FormData): Record<string, unknown> {
+function extractFormData(data: FormData | URLSearchParams): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const [key, value] of data.entries()) {
     result[key] = value;

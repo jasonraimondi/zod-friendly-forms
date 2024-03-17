@@ -73,7 +73,7 @@ validData;
 // }
 ```
 
-You can use the builtin `FormData` object.
+You can use the builtin `FormData` or `URLSearchParams` object.
 
 ```ts
 const data = new FormData();
