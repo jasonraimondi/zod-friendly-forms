@@ -89,7 +89,7 @@ function flattenErrors(result: z.SafeParseError<unknown>) {
 
 function extractFormData(data: FormData | URLSearchParams): Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  for (const [key, value] of data.entries()) {
+  for (const [key, value] of data) {
     result[key] = value;
   }
   return result;
