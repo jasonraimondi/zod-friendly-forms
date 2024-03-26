@@ -1,10 +1,21 @@
 import { z } from "./deps.ts";
 
+/**
+ * Parameters for parsing a form.
+ * @property schema - The Zod schema to validate the form data.
+ * @property data - The form data to parse.
+ */
 export type ParseFormParams = {
   schema: z.ZodType;
   data: Record<string, unknown> | FormData | URLSearchParams;
 };
 
+/**
+ * The result of parsing a form. Either the form data is valid or there are errors.
+ * @property errors - A key-value dictionary of errors.
+ * @property zodError - The Zod error object.
+ * @property validData - The valid form data.
+ */
 export type ParseFormResult<T extends z.ZodType> = {
   errors?: never;
   zodError?: never;
@@ -15,6 +26,20 @@ export type ParseFormResult<T extends z.ZodType> = {
   validData?: never;
 };
 
+/**
+ * Parse form data using a Zod schema and return a friendly key-value dict of errors
+ * @param params - The parameters for the form parsing.
+ * @param options - Additional options for the form parsing.
+ * @returns The result of the form parsing.
+ * @example """
+ *   const schema = z.object({
+ *    email: z.string().email(),
+ *    password: z.string().min(8),
+ *   });
+ *   const data = { email: "jason", password: "12345678" };
+ *   const { validData, errors } = parseForm({ schema, data });
+ * """
+ */
 export function parseForm(
   params: ParseFormParams,
   options?: { stripEmptyStrings?: boolean },

@@ -1,10 +1,9 @@
 # Zod Friendly Forms
 
-[![Deno Version](https://shield.deno.dev/x/zod_ff?style=flat-square)](https://deno.land/x/zod_ff)
-[![Npmjs.org Version](https://img.shields.io/npm/v/zod-ff?style=flat-square)](https://www.npmjs.com/package/zod-ff)
+[![JSR](https://jsr.io/badges/@jmondi/zod-friendly-forms)](https://jsr.io/@jmondi/zod-friendly-forms)
+[![JSR Score](https://jsr.io/badges/@jmondi/zod-friendly-forms/score)](https://jsr.io/@jmondi/zod-friendly-forms)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jasonraimondi/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/jasonraimondi/zod-friendly-forms)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage/jasonraimondi/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/jasonraimondi/zod-friendly-forms/test_coverage)
-[![NPM Downloads](https://img.shields.io/npm/dt/zod-ff?label=npm%20downloads&style=flat-square)](https://www.npmjs.com/package/zod-ff)
 
 Returns an object containing `errors` and `validData`. The `errors` object
 contains user-friendly error messages, making it easy to display validation
@@ -16,13 +15,14 @@ submissions.
 ## Install (npm)
 
 ```bash
-pnpm add zod-ff zod
+pnpm add zod
+pnpm dlx jsr add @jmondi/zod-friendly-forms
 ```
 
 ### Deno
 
-```ts
-import { parseForm } from "https://deno.land/x/zod_ff";
+```bash
+deno add @jmondi/zod-friendly-forms
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ When you're ready to validate your input data, go ahead and run the `parseForm`
 function. If there are any errors, they will be available by input key.
 
 ```ts
-import { parseForm } from "zod-ff";
+import { parseForm } from "@jmondi/zod-friendly-forms";
 
 const data = {
   email: "invalid-email",
@@ -57,7 +57,7 @@ If errors are undefined, the input was valid. A returned `validData` object will
 be typed with your response.
 
 ```ts
-import { parseForm } from "zod-ff";
+import { parseForm } from "@jmondi/zod-friendly-forms";
 
 const data = {
   email: "bob@example.com",
@@ -117,7 +117,7 @@ This library will work on the server or client, in any framework.
 ```html
 <script lang="ts">
   import { z } from "zod";
-  import { parseForm } from "zod-ff";
+  import { parseForm } from "@jmondi/zod-friendly-forms";
 
   import { handleLogin } from "./my-login-function";
 
@@ -173,7 +173,7 @@ This library will work on the server or client, in any framework.
 ```ts
 import React, { useState } from "react";
 import { z } from "zod";
-import { parseForm } from "zod-ff";
+import { parseForm } from "@jmondi/zod-friendly-forms";
 import { handleLogin } from "./my-login-function";
 
 const LoginSchema = z.object({
@@ -319,7 +319,3 @@ export default {
 };  
 </script>
 ```
-
-[deno-package]: https://deno.land/x/zod_ff
-[npm-package]: https://www.npmjs.com/package/zod-ff
-[zod]: https://github.com/colinhacks/zod

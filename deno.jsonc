@@ -1,6 +1,9 @@
 {
+  "name": "@jmondi/zod-friendly-forms",
+  "version": "2.0.0",
+  "exports": "./mod.ts",
   "fmt": {
-    "exclude": ["npm/", "README.md"],
+    "exclude": ["README.md"],
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": false,
