@@ -2,6 +2,9 @@
   "name": "@jmondi/zod-friendly-forms",
   "version": "2.0.0",
   "exports": "./mod.ts",
+  "imports": {
+    "zod": "npm:zod@^4.0.17"
+  },
   "peerDependencies": {
     "zod": "^4.0.0"
   },
