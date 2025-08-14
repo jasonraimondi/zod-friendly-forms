@@ -32,7 +32,7 @@ Create a [zod] schema.
 ```ts
 import { z } from "zod";
 const schema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 ```
 
@@ -90,7 +90,7 @@ errors;
 ```ts
 const schema = z.object({
   user: z.object({
-    email: z.string().email(),
+    email: z.email(),
   }),
 });
 
@@ -124,7 +124,7 @@ This library will work on the server or client, in any framework.
   let errors;
 
   const LoginSchema = z.object({
-    email: z.string().email(),  
+    email: z.email(),  
     password: z.string().min(8),  
   });  
   
@@ -177,7 +177,7 @@ import { parseForm } from "@jmondi/zod-friendly-forms";
 import { handleLogin } from "./my-login-function";
 
 const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   rememberMe: z.boolean(),
 });
@@ -293,7 +293,7 @@ import { parseForm } from 'zod-ff';
 import { handleLogin } from './my-login-function';
 
 const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   rememberMe: z.boolean(),  
 });  

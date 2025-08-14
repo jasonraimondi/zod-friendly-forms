@@ -33,7 +33,7 @@ export type ParseFormResult<T extends z.ZodType> = {
  * @returns The result of the form parsing.
  * @example """
  *   const schema = z.object({
- *    email: z.string().email(),
+ *    email: z.email(),
  *    password: z.string().min(8),
  *   });
  *   const data = { email: "jason", password: "12345678" };

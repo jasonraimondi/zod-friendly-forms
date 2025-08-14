@@ -7,7 +7,7 @@ import { parseForm } from "./index.ts";
 Deno.test("with Record<string, uknown> input", async (t) => {
   const TestingSchema = z.object({
     age: z.number().positive().max(150),
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().min(8),
     rememberMe: z.boolean(),
   });
@@ -138,7 +138,7 @@ Deno.test("with union type errors", async (t) => {
 Deno.test("with FormData data input", async (t) => {
   const schema = z.object({
     age: z.coerce.number().positive().max(150),
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().min(8),
     rememberMe: z.coerce.boolean(),
   });
@@ -164,7 +164,7 @@ Deno.test("with FormData data input", async (t) => {
   await t.step("returns a dict of errors", () => {
     const schema = z.object({
       age: z.coerce.number().positive().max(150),
-      email: z.string().email(),
+      email: z.email(),
       password: z.string().min(8),
       rememberMe: z.coerce.boolean(),
     });
@@ -207,7 +207,7 @@ Deno.test("with FormData data input", async (t) => {
 Deno.test("with URLSearchParams data input", async (t) => {
   const schema = z.object({
     age: z.coerce.number().positive().max(150),
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().min(8),
     rememberMe: z.coerce.boolean(),
   });
@@ -233,7 +233,7 @@ Deno.test("with URLSearchParams data input", async (t) => {
   await t.step("returns a dict of errors", () => {
     const schema = z.object({
       age: z.coerce.number().positive().max(150),
-      email: z.string().email(),
+      email: z.email(),
       password: z.string().min(8),
       rememberMe: z.coerce.boolean(),
     });
