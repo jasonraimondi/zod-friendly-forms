@@ -1,14 +1,15 @@
 {
-  "version": "3",
-  "packages": {
-    "specifiers": {
-      "npm:zod@3.22.4": "npm:zod@3.22.4"
+  "version": "5",
+  "specifiers": {
+    "npm:zod@3.22.4": "3.22.4",
+    "npm:zod@4.0.17": "4.0.17"
+  },
+  "npm": {
+    "zod@3.22.4": {
+      "integrity": "sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg=="
     },
-    "npm": {
-      "zod@3.22.4": {
-        "integrity": "sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==",
-        "dependencies": {}
-      }
+    "zod@4.0.17": {
+      "integrity": "sha512-1PHjlYRevNxxdy2JZ8JcNAw7rX8V9P1AKkP+x/xZfxB0K5FYfuV+Ug6P/6NVSR2jHQ+FzDDoDHS04nYUsOIyLQ=="
     }
   },
   "remote": {

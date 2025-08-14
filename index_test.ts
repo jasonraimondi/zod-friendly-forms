@@ -31,10 +31,10 @@ Deno.test("with Record<string, uknown> input", async (t) => {
     const { errors } = parseForm({ schema: TestingSchema, data });
 
     assertEquals(errors, {
-      age: "Number must be less than or equal to 150",
-      email: "Invalid email",
-      password: "Required",
-      rememberMe: "Required",
+      age: "Too big: expected number to be <=150",
+      email: "Invalid email address",
+      password: "Invalid input: expected string, received undefined",
+      rememberMe: "Invalid input: expected boolean, received undefined",
     });
   });
 
@@ -58,7 +58,7 @@ Deno.test("with Record<string, uknown> input", async (t) => {
   await t.step("can use custom messages", () => {
     const data = {};
     const schema = z.object({
-      quote: z.string({ required_error: "Quote is required" }),
+      quote: z.string({ error: "Quote is required" }),
     });
 
     const { errors } = parseForm({ schema, data });
@@ -77,10 +77,10 @@ Deno.test("with Record<string, uknown> input", async (t) => {
     const { errors } = parseForm({ schema: innerSchema, data });
 
     assertEquals(errors, {
-      "user.age": "Required",
-      "user.email": "Required",
-      "user.password": "Required",
-      "user.rememberMe": "Required",
+      "user.age": "Invalid input: expected number, received undefined",
+      "user.email": "Invalid input: expected string, received undefined",
+      "user.password": "Invalid input: expected string, received undefined",
+      "user.rememberMe": "Invalid input: expected boolean, received undefined",
     });
   });
 });
@@ -104,8 +104,8 @@ Deno.test("with union type errors", async (t) => {
 
     assertEquals(errors, {
       "": "Invalid input",
-      "enabled": "Invalid literal value, expected false",
-      "title": "Required",
+      "enabled": "Invalid input: expected false",
+      "title": "Invalid input: expected string, received undefined",
     });
   });
 
@@ -129,8 +129,8 @@ Deno.test("with union type errors", async (t) => {
 
     assertEquals(errors, {
       foo: "Invalid input",
-      "foo.enabled": "Invalid literal value, expected false",
-      "foo.title": "Required",
+      "foo.enabled": "Invalid input: expected false",
+      "foo.title": "Invalid input: expected string, received undefined",
     });
   });
 });
@@ -175,9 +175,9 @@ Deno.test("with FormData data input", async (t) => {
     const { errors } = parseForm({ schema, data });
 
     assertEquals(errors, {
-      age: "Number must be less than or equal to 150",
-      email: "Invalid email",
-      password: "Required",
+      age: "Too big: expected number to be <=150",
+      email: "Invalid email address",
+      password: "Invalid input: expected string, received undefined",
       // @note booleans are marked false if missing when coerced
       // rememberMe: "Required",
     });
@@ -195,7 +195,7 @@ Deno.test("with FormData data input", async (t) => {
   await t.step("can use custom messages", () => {
     const data = new FormData();
     const schema = z.object({
-      quote: z.string({ required_error: "Quote is required" }),
+      quote: z.string({ error: "Quote is required" }),
     });
 
     const { errors } = parseForm({ schema, data });
@@ -244,9 +244,9 @@ Deno.test("with URLSearchParams data input", async (t) => {
     const { errors } = parseForm({ schema, data });
 
     assertEquals(errors, {
-      age: "Number must be less than or equal to 150",
-      email: "Invalid email",
-      password: "Required",
+      age: "Too big: expected number to be <=150",
+      email: "Invalid email address",
+      password: "Invalid input: expected string, received undefined",
       // @note booleans are marked false if missing when coerced
       // rememberMe: "Required",
     });
@@ -264,7 +264,7 @@ Deno.test("with URLSearchParams data input", async (t) => {
   await t.step("can use custom messages", () => {
     const data = new URLSearchParams();
     const schema = z.object({
-      quote: z.string({ required_error: "Quote is required" }),
+      quote: z.string({ error: "Quote is required" }),
     });
 
     const { errors } = parseForm({ schema, data });
@@ -293,6 +293,6 @@ Deno.test("with option - stripEmptyStrings true", async (t) => {
 
     const { errors } = parseForm({ schema: TestingSchema, data }, { stripEmptyStrings: true });
 
-    assertEquals(errors, { password: "Required" });
+    assertEquals(errors, { password: "Invalid input: expected string, received undefined" });
   });
 });

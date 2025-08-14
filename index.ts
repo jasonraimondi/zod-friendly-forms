@@ -71,45 +71,40 @@ export function parseForm(
   return { errors: flattenErrors(parseResults), zodError };
 }
 
-function flattenErrors(result: z.SafeParseError<unknown>) {
-  return result.error.errors.reduce<Record<string, string>>(
-    (prev: Record<string, string>, next) => {
-      const result = { ...prev };
-      const key = next.path.join(".");
-      result[key] = next.message;
-
-      // we'll cover more cases here as we need them
-      switch (next.code) {
-        case "invalid_union":
-          next.unionErrors.forEach((unionError) => {
-            unionError.errors.forEach((error) => {
-              result[error.path.join(".")] = error.message;
+function flattenErrors(result: z.ZodSafeParseError<unknown>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  
+  result.error.issues.forEach((issue) => {
+    const path = issue.path.length > 0 ? issue.path.join(".") : "";
+    
+    if (issue.code === "invalid_union") {
+      errors[path] = issue.message;
+      
+      const unionIssue = issue as any;
+      if (unionIssue.errors && Array.isArray(unionIssue.errors)) {
+        unionIssue.errors.forEach((unionErrorArray: any) => {
+          if (Array.isArray(unionErrorArray)) {
+            unionErrorArray.forEach((subIssue: any) => {
+              const subPath = path.length > 0 
+                ? `${path}.${subIssue.path.join(".")}`
+                : subIssue.path.join(".");
+              if (subPath && !errors[subPath]) {
+                errors[subPath] = subIssue.message;
+              }
             });
-          });
-          break;
-        case "invalid_type":
-        case "invalid_literal":
-        case "custom":
-        case "invalid_union_discriminator":
-        case "invalid_enum_value":
-        case "unrecognized_keys":
-        case "invalid_arguments":
-        case "invalid_return_type":
-        case "invalid_date":
-        case "invalid_string":
-        case "too_small":
-        case "too_big":
-        case "invalid_intersection_types":
-        case "not_multiple_of":
-        case "not_finite":
-        default:
-          break;
+          }
+        });
       }
-
-      return result;
-    },
-    {},
-  );
+    } else {
+      if (path) {
+        errors[path] = issue.message;
+      } else {
+        errors[""] = issue.message;
+      }
+    }
+  });
+  
+  return errors;
 }
 
 function extractFormData(data: FormData | URLSearchParams): Record<string, unknown> {

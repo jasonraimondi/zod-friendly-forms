@@ -1,1 +1,1 @@
-export { z } from "npm:zod@3.22.4";
+export { z } from "npm:zod@4.0.17";
