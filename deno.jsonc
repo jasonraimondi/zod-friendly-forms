@@ -2,6 +2,9 @@
   "name": "@jmondi/zod-friendly-forms",
   "version": "2.0.0",
   "exports": "./mod.ts",
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
   "fmt": {
     "exclude": ["README.md"],
     "lineWidth": 100,

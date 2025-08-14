@@ -73,19 +73,19 @@ export function parseForm(
 
 function flattenErrors(result: z.ZodSafeParseError<unknown>): Record<string, string> {
   const errors: Record<string, string> = {};
-  
+
   result.error.issues.forEach((issue) => {
     const path = issue.path.length > 0 ? issue.path.join(".") : "";
-    
+
     if (issue.code === "invalid_union") {
       errors[path] = issue.message;
-      
+
       const unionIssue = issue as any;
       if (unionIssue.errors && Array.isArray(unionIssue.errors)) {
         unionIssue.errors.forEach((unionErrorArray: any) => {
           if (Array.isArray(unionErrorArray)) {
             unionErrorArray.forEach((subIssue: any) => {
-              const subPath = path.length > 0 
+              const subPath = path.length > 0
                 ? `${path}.${subIssue.path.join(".")}`
                 : subIssue.path.join(".");
               if (subPath && !errors[subPath]) {
@@ -103,7 +103,7 @@ function flattenErrors(result: z.ZodSafeParseError<unknown>): Record<string, str
       }
     }
   });
-  
+
   return errors;
 }
 
