@@ -1,6 +1,6 @@
 {
   "name": "@jmondi/zod-friendly-forms",
-  "version": "2.0.0",
+  "version": "4.0.0-alpha.1",
   "exports": "./mod.ts",
   "imports": {
     "zod": "npm:zod@^4.0.17"
