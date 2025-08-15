@@ -5,317 +5,324 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jasonraimondi/zod-friendly-forms/test.yml?branch=main&label=Unit%20Tests&style=flat-square)](https://github.com/jasonraimondi/zod-friendly-forms)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage/jasonraimondi/zod-friendly-forms?style=flat-square)](https://codeclimate.com/github/jasonraimondi/zod-friendly-forms/test_coverage)
 
-Returns an object containing `errors` and `validData`. The `errors` object
-contains user-friendly error messages, making it easy to display validation
-errors to the user, while the `validData` object contains the typed and valid
-data from the schema. This library can be used in any framework, both on the
-server or client side and it allows for easy validation and handling of form
-submissions.
+**Transform Zod validation errors into user-friendly form error messages.**
 
-## Install (npm)
+## The Problem
 
+Zod gives you great validation, but its error messages aren't ready for end users:
+
+```ts
+// Zod's raw error output
+{
+  "email": [
+    {
+      "code": "invalid_string",
+      "message": "Invalid email",
+      "path": ["email"]
+    }
+  ]
+}
+```
+
+## The Solution
+
+Get clean, user-ready error messages that you can display directly in your forms:
+
+```ts
+import { parseForm } from "@jmondi/zod-friendly-forms";
+
+const { errors } = parseForm({ schema, data });
+
+// Clean, user-friendly output
+{
+  "email": "Invalid email"
+}
+```
+
+## Quick Start
+
+```ts
+import { z } from "zod";
+import { parseForm } from "@jmondi/zod-friendly-forms";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+});
+
+const formData = {
+  email: "invalid-email",
+  password: "123"
+};
+
+const { errors, validData } = parseForm({ schema, data: formData });
+
+if (errors) {
+  console.log(errors);
+  // {
+  //   email: "Invalid email",
+  //   password: "String must contain at least 8 character(s)"
+  // }
+} else {
+  console.log(validData); // Fully typed and validated data
+}
+```
+
+## Features
+
+- ✅ **User-friendly error messages** - Ready to display to end users
+- ✅ **Type-safe validation** - Fully typed validated data
+- ✅ **Framework agnostic** - Works with React, Vue, Svelte, vanilla JS
+- ✅ **FormData support** - Handles web forms, URLSearchParams, and plain objects
+- ✅ **Nested object errors** - Flattened dot-notation keys (e.g., `user.email`)
+- ✅ **Server & client** - Use anywhere JavaScript runs
+
+## Version Compatibility
+
+- **zod-friendly-forms v4.0+**: Supports Zod v4.x
+- **zod-friendly-forms v2.0**: Use this version for Zod v3.x compatibility
+
+## Installation
+
+### npm/pnpm
 ```bash
 pnpm add zod
 pnpm dlx jsr add @jmondi/zod-friendly-forms
 ```
 
 ### Deno
-
 ```bash
 deno add @jmondi/zod-friendly-forms
 ```
 
 ## Usage
 
-Create a [zod] schema.
+### Basic Usage
 
 ```ts
 import { z } from "zod";
+import { parseForm } from "@jmondi/zod-friendly-forms";
+
 const schema = z.object({
-  email: z.email(),
+  email: z.string().email(),
 });
+
+const { errors, validData } = parseForm({ 
+  schema, 
+  data: { email: "bob@example.com" } 
+});
+
+if (!errors) {
+  // validData is fully typed as { email: string }
+  console.log(validData.email); // TypeScript knows this is a string
+}
 ```
 
-When you're ready to validate your input data, go ahead and run the `parseForm`
-function. If there are any errors, they will be available by input key.
+### With FormData
+
+Works seamlessly with HTML forms:
 
 ```ts
-import { parseForm } from "@jmondi/zod-friendly-forms";
+const formData = new FormData();
+formData.append("email", "invalid-email");
 
-const data = {
-  email: "invalid-email",
-};
-const { errors } = parseForm({ schema, data });
-
-errors;
-// {
-//   email: "Invalid email",
-// }
+const { errors } = parseForm({ schema, data: formData });
+// { email: "Invalid email" }
 ```
 
-If errors are undefined, the input was valid. A returned `validData` object will
-be typed with your response.
+### Nested Objects
 
-```ts
-import { parseForm } from "@jmondi/zod-friendly-forms";
-
-const data = {
-  email: "bob@example.com",
-};
-const { errors, validData } = parseForm({ schema, data });
-
-errors;
-// undefined
-
-validData;
-// {
-//   email: "bob@example.com",
-// }
-```
-
-You can use the builtin `FormData` or `URLSearchParams` object.
-
-```ts
-const data = new FormData();
-data.append("email", "invalid-email");
-
-const { errors } = parseForm({ schema, data });
-
-errors;
-// {
-//   email: "Invalid email",
-// }
-```
+Handles complex nested validation with flattened error keys:
 
 ```ts
 const schema = z.object({
   user: z.object({
-    email: z.email(),
-  }),
+    email: z.string().email(),
+    profile: z.object({
+      name: z.string().min(2)
+    })
+  })
 });
 
-const data = {
-  user: {
-    email: "bob",
-  },
-};
+const { errors } = parseForm({ 
+  schema, 
+  data: { 
+    user: { 
+      email: "invalid", 
+      profile: { name: "x" } 
+    } 
+  } 
+});
 
-const { errors } = parseForm({ schema: RegisterSchema, data }, options);
-
-errors;
+console.log(errors);
 // {
-//   "user.email": "Invalid Email Address",
+//   "user.email": "Invalid email",
+//   "user.profile.name": "String must contain at least 2 character(s)"
 // }
 ```
 
-## Examples
-
-This library will work on the server or client, in any framework.
-
-### Svelte Examples
-
-```html
-<script lang="ts">
-  import { z } from "zod";
-  import { parseForm } from "@jmondi/zod-friendly-forms";
-
-  import { handleLogin } from "./my-login-function";
-
-  let errors;
-
-  const LoginSchema = z.object({
-    email: z.email(),  
-    password: z.string().min(8),  
-  });  
-  
-  const loginForm = {  
-    email: "",  
-    password: "",  
-  };  
-  
-  async function submit() {  
-    let { data, errors } = await parseForm<typeof LoginSchema>({ schema: LoginSchema, data: loginForm });  
-    if (!errors) await handleLogin(data);  
-  }  
-</script>  
-  
-<form on:submit|preventDefault="{submit}">  
-  <label for="email">Email
-    {#if errors?.email}<span class="error">{errors.email}</span>{/if}
-    <input
-      id="email"
-      name="email"
-      type="email"
-      required="required"
-      bind:value="{loginForm.email}"
-    />
-  </label>
-
-  <label for="password">Password
-    {#if errors?.password}<span class="error">{errors.password}</span>{/if}
-    <input
-      id="password"
-      name="password"
-      type="password"
-      required="required"
-      bind:value="{loginForm.password}"
-    />
-  </label>
-  
-  <footer class="form-submit">  
-    <button type="submit">Submit</button>  
-  </footer>  
-</form>
-```
-
-### React Example
+### Options
 
 ```ts
-import React, { useState } from "react";
+const { errors, validData } = parseForm(
+  { schema, data },
+  { stripEmptyStrings: true } // Convert empty strings to undefined
+);
+```
+
+## Framework Examples
+
+### React
+
+```tsx
+import { useState } from "react";
 import { z } from "zod";
 import { parseForm } from "@jmondi/zod-friendly-forms";
-import { handleLogin } from "./my-login-function";
 
 const LoginSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(8),
-  rememberMe: z.boolean(),
 });
 
-const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
+export function LoginForm() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let { data, errors } = await parseForm({
-      schema: LoginSchema,
-      data: formData,
+    const { errors, validData } = parseForm({ 
+      schema: LoginSchema, 
+      data: formData 
     });
-    if (!errors) await handleLogin(data);
-    setErrors(errors);
+    
+    if (errors) {
+      setErrors(errors);
+    } else {
+      // Handle successful login with validData
+      await login(validData);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="email">
-        Email
-        {errors.email && <span className="error">{errors.email}</span>}
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-      </label>
-
-      <label htmlFor="password">
-        Password
-        {errors.password && <span className="error">{errors.password}</span>}
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          value={formData.password}
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })}
-        />
-      </label>
-      <label htmlFor="rememberMe">
-        Remember Me
-        <input
-          id="rememberMe"
-          type="checkbox"
-          checked={formData.rememberMe}
-          onChange={(e) =>
-            setFormData({ ...formData, rememberMe: e.target.checked })}
-        />
-      </label>
-
-      <footer className="form-submit">
-        <button type="submit">Submit</button>
-      </footer>
+      <input 
+        type="email" 
+        value={formData.email}
+        onChange={(e) => setFormData({...formData, email: e.target.value})}
+      />
+      {errors.email && <span className="error">{errors.email}</span>}
+      
+      <input 
+        type="password" 
+        value={formData.password}
+        onChange={(e) => setFormData({...formData, password: e.target.value})}
+      />
+      {errors.password && <span className="error">{errors.password}</span>}
+      
+      <button type="submit">Login</button>
     </form>
   );
-};
+}
 ```
 
-### Vue 3 Example
+### Svelte
 
-```html
-<template>  
-  <form @submit.prevent="submit">  
-    <label for="email">Email
-      <span class="error" v-if="errors.email">{{ errors.email }}</span>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        required
-        v-model="formData.email"
-      />
-    </label>
+```svelte
+<script lang="ts">
+  import { z } from "zod";
+  import { parseForm } from "@jmondi/zod-friendly-forms";
 
-    <label for="password">Password
-      <span class="error" v-if="errors.password">{{ errors.password }}</span>
-      <input
-        id="password"
-        name="password"
-        type="password"
-        required
-        v-model="formData.password"
-      />
-    </label>
-    <label for="rememberMe">Remember Me
-      <input
-        id="rememberMe"
-        type="checkbox"
-        v-model="formData.rememberMe"
-      />
-    </label>
+  const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+  });
 
-    <footer class="form-submit">
-      <button type="submit">Submit</button>  
-    </footer>  
-  </form>  
+  let formData = { email: "", password: "" };
+  let errors = {};
+
+  async function handleSubmit() {
+    const result = parseForm({ schema, data: formData });
+    if (result.errors) {
+      errors = result.errors;
+    } else {
+      await login(result.validData);
+    }
+  }
+</script>
+
+<form on:submit|preventDefault={handleSubmit}>
+  <input bind:value={formData.email} type="email" />
+  {#if errors.email}<span class="error">{errors.email}</span>{/if}
+  
+  <input bind:value={formData.password} type="password" />
+  {#if errors.password}<span class="error">{errors.password}</span>{/if}
+  
+  <button type="submit">Login</button>
+</form>
+```
+
+### Vue
+
+```vue
+<template>
+  <form @submit.prevent="handleSubmit">
+    <input v-model="formData.email" type="email" />
+    <span v-if="errors.email" class="error">{{ errors.email }}</span>
+    
+    <input v-model="formData.password" type="password" />
+    <span v-if="errors.password" class="error">{{ errors.password }}</span>
+    
+    <button type="submit">Login</button>
+  </form>
 </template>
 
 <script>
 import { z } from 'zod';
-import { parseForm } from 'zod-ff';
-import { handleLogin } from './my-login-function';
+import { parseForm } from '@jmondi/zod-friendly-forms';
 
-const LoginSchema = z.object({
-  email: z.email(),
+const schema = z.object({
+  email: z.string().email(),
   password: z.string().min(8),
-  rememberMe: z.boolean(),  
-});  
-  
-export default {  
-  data() {  
-    return {  
-      formData: {  
-        email: "",  
-        password: "",  
-        rememberMe: false,  
-      },  
-      errors: {}  
-    };  
-  },  
-  methods: {  
-    async submit() {  
-      let { data, errors } = await parseForm({ schema: LoginSchema, data: this.formData });  
-      if (!errors) await handleLogin(data);  
-      this.errors = errors;  
-    }  
-  }  
-};  
+});
+
+export default {
+  data() {
+    return {
+      formData: { email: "", password: "" },
+      errors: {}
+    };
+  },
+  methods: {
+    async handleSubmit() {
+      const { errors, validData } = parseForm({ 
+        schema, 
+        data: this.formData 
+      });
+      
+      if (errors) {
+        this.errors = errors;
+      } else {
+        await this.login(validData);
+      }
+    }
+  }
+};
 </script>
 ```
+
+## API Reference
+
+### `parseForm(params, options?)`
+
+**Parameters:**
+- `params.schema` - Zod schema for validation
+- `params.data` - Form data (object, FormData, or URLSearchParams)
+- `options.stripEmptyStrings` - Convert empty strings to undefined (optional)
+
+**Returns:**
+- Success: `{ validData: T, errors: undefined }`
+- Failure: `{ errors: Record<string, string>, validData: undefined }`
+
+## License
+
+MIT
