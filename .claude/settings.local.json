@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(deno test:*)",
+      "Bash(deno task:*)",
+      "Bash(deno check:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
