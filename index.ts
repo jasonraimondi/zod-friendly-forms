@@ -5,8 +5,8 @@ import { z } from "./deps.ts";
  * @property schema - The Zod schema to validate the form data.
  * @property data - The form data to parse.
  */
-export type ParseFormParams = {
-  schema: z.ZodType;
+export type ParseFormParams<T extends z.ZodType = z.ZodType> = {
+  schema: T;
   data: Record<string, unknown> | FormData | URLSearchParams;
 };
 
@@ -40,10 +40,10 @@ export type ParseFormResult<T extends z.ZodType> = {
  *   const { validData, errors } = parseForm({ schema, data });
  * """
  */
-export function parseForm(
-  params: ParseFormParams,
+export function parseForm<T extends z.ZodType>(
+  params: ParseFormParams<T>,
   options?: { stripEmptyStrings?: boolean },
-): ParseFormResult<typeof params.schema> {
+): ParseFormResult<T> {
   const { schema, data } = params;
 
   let unknownData: Record<string, unknown>;
@@ -63,7 +63,7 @@ export function parseForm(
   const parseResults = schema.safeParse(unknownData);
 
   if (parseResults.success) {
-    return { validData: parseResults.data };
+    return { validData: parseResults.data, errors: undefined, zodError: undefined };
   }
 
   const zodError = parseResults.error;

@@ -66,6 +66,35 @@ Deno.test("with Record<string, uknown> input", async (t) => {
     assertEquals(errors, { quote: "Quote is required" });
   });
 
+  await t.step("validData has correct type inference", () => {
+    const schema = z.object({
+      name: z.string(),
+      age: z.number(),
+      isActive: z.boolean(),
+    });
+
+    const data = {
+      name: "John",
+      age: 30,
+      isActive: true,
+    };
+
+    const result = parseForm({ schema, data });
+
+    // Test that validData has the correct type by attempting type-safe property access
+    if (!result.errors) {
+      // If validData is unknown, TypeScript will error on these property accesses
+      const name: string = result.validData.name;
+      const age: number = result.validData.age;
+      const isActive: boolean = result.validData.isActive;
+
+      // Verify the actual values
+      assertEquals(name, "John");
+      assertEquals(age, 30);
+      assertEquals(isActive, true);
+    }
+  });
+
   await t.step("supports objects", () => {
     const innerSchema = z.object({
       user: TestingSchema,
